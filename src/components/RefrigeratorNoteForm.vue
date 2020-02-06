@@ -1,4 +1,6 @@
 <template>
+  <div>
+  <input class="button-clear button-small float-right" type="submit" value="Log Out" @click="logOutNow">
   <div class="component">
     <input class="button button-clear" type="submit" value="---> See List Of Note <---" @click="toListNote">
     <h3 class="center">Send Your Note</h3>
@@ -14,6 +16,7 @@
       <input class="button-black float-right" type="submit" value="Write" :disabled="isDisable">
     </fieldset>
     </form>
+  </div>
   </div>
 </template>
 
@@ -39,6 +42,10 @@ export default {
     sendNote:{
       type:Function,
       required:true
+    },
+    logoutMethod:{
+      type:Function,
+      required:true
     }
   },
   computed:{
@@ -58,6 +65,9 @@ export default {
       })
       this.selectedUser = ''
       this.inputNote = ''
+    },
+    logOutNow(){
+      this.logoutMethod()
     }
   },
   mounted(){

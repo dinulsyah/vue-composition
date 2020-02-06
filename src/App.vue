@@ -1,13 +1,16 @@
 <template>
   <div id="app">
     <RefrigeratorLoginForm v-show="onPage === 'on-no-login'" :login-method="loginRefrigerator"/>
-    <RefrigeratorNoteForm v-if="onPage === 'on-login'" :to-section="changeSection" :send-note="addNoteToList"/>
+    <RefrigeratorNoteForm v-if="onPage === 'on-login'" :to-section="changeSection" :send-note="addNoteToList" :logout-method="logoutRefrigerator"/>
     <ListNoteTable v-show="onPage === 'on-note'" :to-section="changeSection" :list-note="noteList" :delete-note="deleteNote"/>
     <modal name="delete" width="70%" height="auto">
         Horay You Just Deleting One Note...
     </modal>
     <modal name="error-login" width="70%" height="auto">
         Sorry, your username/password was incorrect. Please double-check your username/password 
+    </modal>
+    <modal name="logout" width="70%" height="auto">
+        You Have Sign Out, Come Back Anytime
     </modal>
   </div>
 </template>
@@ -28,7 +31,8 @@ export default {
   data(){
     return{
       noteList:[],
-      onPage: null
+      onPage: null,
+      logoutState:false
     }
   },
   methods:{
@@ -60,6 +64,22 @@ export default {
     },
     modalShow(){
       this.$modal.show('error-login');
+    },
+    logoutRefrigerator(){
+        this.logoutState = true
+    },
+    modalLogout(){
+      this.$modal.show('logout');
+    },
+  },
+  watch:{
+    logoutState:function(newState){
+      if(newState){
+        this.onPage = 'on-no-login'
+        localStorage.clear()
+        this.modalLogout()
+        this.logoutState = false
+      }
     }
   },
   created(){
