@@ -9,7 +9,7 @@
       <label for="nameField">Send To</label>
       <select id="availableUser" v-model="selectedUser">
         <option value="" selected>Select Available User</option>
-        <option :value="user" :key="user" v-for="user in allUsers">{{ user }} </option>
+        <option :value="user" :key="user" v-for="user in allUsers.data">{{ user }} </option>
       </select>
       <label for="nameField">Note</label>
       <input type="text" :placeholder="placeholder" id="nameField" v-model="inputNote">
@@ -22,18 +22,10 @@
 
 <script>
 import { Users } from '../users';
+import { reactive, ref, computed, onMounted } from '@vue/composition-api'
 
 export default {
-  data(){
-    return{
-      placeholder:'',
-      allUsers:[],
-      inputNote:'',
-      minNote:10,
-      username:'',
-      selectedUser:''
-    }
-  },
+  name: 'RefrigeratorNoteForm',
   props:{
     toSection:{
       type:Function,
@@ -48,34 +40,59 @@ export default {
       required:true
     }
   },
-  computed:{
-    isDisable:function(){
-      return !(this.inputNote.length > this.minNote && this.selectedUser !== '');
-    }
-  },
-  methods:{
-    toListNote(){
-      this.toSection({section:'on-note'})
-    },
-    addNote(){
-      this.sendNote({
-        from:this.username,
-        sendTo:this.selectedUser, 
-        note:this.inputNote
+  setup(props){
+    let placeholder = ref('')
+
+    let allUsers = reactive({
+      data:[]
+    })
+    let selectedUser = ref('')
+
+    let inputNote = ref('')
+    let minNote = ref(10)
+
+    const addNote = () => {
+      props.sendNote({
+        from:username.value,
+        sendTo:selectedUser.value, 
+        note:inputNote.value
       })
-      this.selectedUser = ''
-      this.inputNote = ''
-    },
-    logOutNow(){
-      this.logoutMethod()
+      selectedUser.value = ''
+      inputNote.value = ''
     }
-  },
-  mounted(){
-    this.username = Users[localStorage.getItem('username')]['name']
-    this.placeholder = `life-and-death Note From ${this.username}`
-    this.allUsers = Object.keys(Users)
-      .filter(user => user !== localStorage.getItem('username'))
-      .map(user => Users[user]['name'])
+
+    let username = ref()
+
+    const logOutNow = () => {
+      props.logoutMethod()
+    }
+
+    const isDisable = computed(() => {
+      return !(inputNote.value.length > minNote.value && selectedUser.value !== '');
+    })
+
+    const toListNote = () => {
+      props.toSection({section:'on-note'})
+    }
+
+    onMounted(() => {
+      username.value = Users[localStorage.getItem('username')]['name']
+      placeholder.value = `life-and-death Note From ${username.value}`
+      allUsers.data = Object.keys(Users)
+        .filter(user => user !== localStorage.getItem('username'))
+        .map(user => Users[user]['name'])
+    })
+
+    return {
+      placeholder,
+      allUsers,
+      inputNote,
+      selectedUser,
+      isDisable,
+      addNote,
+      toListNote,
+      logOutNow
+    }
   }
 }
 </script>

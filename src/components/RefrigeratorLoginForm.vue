@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import { ref, computed } from '@vue/composition-api'
+
 export default {
   name: 'RefrigeratorLoginForm',
   props: {
@@ -22,24 +24,27 @@ export default {
       required:true
     }
   },
-  data(){
+  setup(props){
+    let username = ref('')
+    let password = ref('')
+    let minUsername = ref(5)
+    let minPassword = ref(5)
+    
+    const loginForm = () => {
+      props.loginMethod({username:username.value,password:password.value})
+      username.value = ''
+      password.value = ''
+    }
+
+    const isDisable = computed(() => {
+       return !(username.value.length > minUsername.value && password.value.length > minPassword.value)
+    })
+
     return{
-      username:'',
-      password:'',
-      minUsername:5,
-      minPassword:5
-    }
-  },
-  computed:{
-    isDisable:function(){
-      return !(this.username.length > this.minUsername && this.password.length > this.minPassword)
-    }
-  },
-  methods:{
-    loginForm(){
-      this.loginMethod({username:this.username,password:this.password})
-      this.username = ''
-      this.password = ''
+      username,
+      password,
+      loginForm,
+      isDisable
     }
   }
 }

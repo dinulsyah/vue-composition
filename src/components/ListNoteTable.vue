@@ -28,6 +28,8 @@
 </template>
 
 <script>
+import useListNote from '../cmp-fun/ListNoteTable'
+
 export default {
     props:{
         toSection:{
@@ -43,13 +45,8 @@ export default {
             required:true
         }
     },
-    methods:{
-        toAddNote(){
-            this.toSection({section:'on-login'})
-        },
-        deleteList(index){
-            this.deleteNote(index)
-        }
+    setup(props){
+       return useListNote(props)
     }
 }
 </script>
